@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar Viewer</title>
+<style>
+  :root {
+    --bg: #f4f1ea; --panel: #ffffff; --ink: #1f1d1a; --muted: #6b665d; --line: #e2ddd2;
+    --accent: #d9480f; --accent-ink: #ffffff; --chip: #f1ede4; --chip-on: #1f1d1a; --chip-on-ink: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161513; --panel: #1f1e1b; --ink: #f1eee8; --muted: #a39d92; --line: #34322d;
+      --accent: #ff7a3d; --accent-ink: #161513; --chip: #2a2825; --chip-on: #f1eee8; --chip-on-ink: #161513;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, sans-serif;
+         display: grid; grid-template-columns: 1fr 340px; }
+  #stage { position: relative; min-height: 0; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  #now { position: absolute; left: 16px; top: 16px; background: var(--panel); border: 1px solid var(--line);
+         padding: 6px 10px; border-radius: 8px; font-weight: 600; }
+  #status { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+  aside { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 8px; }
+  h2:first-child { margin-top: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button { border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 999px;
+                  padding: 4px 10px; cursor: pointer; font: inherit; font-size: 13px; }
+  .chips button small { color: var(--muted); margin-left: 4px; }
+  .chips button.on { background: var(--chip-on); color: var(--chip-on-ink); border-color: var(--chip-on); }
+  .chips button.on small { color: inherit; opacity: .7; }
+  details summary { cursor: pointer; color: var(--muted); margin: 10px 0 6px; }
+  label.row { display: grid; grid-template-columns: 90px 1fr 42px; align-items: center; gap: 8px; margin: 6px 0; }
+  label.row output { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .colors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .colors label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+  .colors input { width: 100%; height: 32px; border: 1px solid var(--line); border-radius: 6px; background: none; padding: 2px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btns button, .btns label.file { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 8px;
+                padding: 8px 12px; font: inherit; font-weight: 600; cursor: pointer; }
+  .btns button.ghost { background: var(--chip); color: var(--ink); border: 1px solid var(--line); }
+  .btns label.file input { display: none; }
+  .check { display: flex; gap: 8px; align-items: center; margin: 6px 0; }
+  p.note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+  @media (max-width: 760px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 55vh auto; }
+    aside { border-left: 0; border-top: 1px solid var(--line); }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="stage"><div id="now">Loading…</div><div id="status">Loading KayKit Knight (3.6 MB)…</div></div>
+<aside>
+  <h2>Party picks</h2>
+  <div class="chips" id="picks"></div>
+  <details><summary>All 76 clips</summary><div class="chips" id="all"></div></details>
+
+  <h2>Playback</h2>
+  <label class="row">Speed <input type="range" id="speed" min="0.25" max="2" step="0.05" value="1"><output></output></label>
+  <label class="row">Blend time <input type="range" id="fade" min="0" max="0.8" step="0.05" value="0.25"><output></output></label>
+
+  <h2>Body shape</h2>
+  <label class="row">Legs <input type="range" data-body="leg" min="0.5" max="2.4" step="0.05" value="1"><output></output></label>
+  <label class="row">Torso <input type="range" data-body="torso" min="0.6" max="2" step="0.05" value="1"><output></output></label>
+  <label class="row">Girth <input type="range" data-body="girth" min="0.7" max="1.6" step="0.05" value="1"><output></output></label>
+  <label class="row">Arms <input type="range" data-body="arm" min="0.6" max="1.6" step="0.05" value="1"><output></output></label>
+  <label class="row">Head <input type="range" data-body="head" min="0.6" max="1.8" step="0.05" value="1"><output></output></label>
+  <div class="chips" id="presets"></div>
+
+  <h2>Colours</h2>
+  <div class="colors" id="colors"></div>
+
+  <h2>Face mask</h2>
+  <div class="btns">
+    <button id="knock">Knock mask off</button>
+    <button id="pickup" class="ghost">Put it back</button>
+    <label class="file">Use a photo<input type="file" id="photo" accept="image/*" capture="user"></label>
+  </div>
+  <label class="check"><input type="checkbox" id="showMask" checked> Show mask</label>
+  <label class="check"><input type="checkbox" id="gear"> Knight gear (helmet, cape, weapons)</label>
+  <p class="note">Photos stay in this browser tab. Nothing is uploaded.</p>
+</aside>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0@main/addons/kaykit_character_pack_adventures/Characters/gltf/Knight.glb';
+const IDLE = 'Unarmed_Idle';
+const PICKS = ['Unarmed_Idle', 'Idle', 'Cheer', 'Hit_A', 'Hit_B', 'Death_A', 'Death_B', 'Jump_Full_Short', 'Jump_Full_Long',
+  'PickUp', 'Interact', 'Use_Item', 'Throw', 'Spellcast_Raise', 'Spellcast_Long', 'Sit_Chair_Down', 'Sit_Floor_Down',
+  'Lie_Down', 'Dodge_Backward', 'Block_Hit', 'Walking_A', 'Running_A', 'Unarmed_Melee_Attack_Punch_A', 'Unarmed_Melee_Attack_Kick'];
+const LOOP = /Idle|Walking|Running|ing$|Cheer|Pose$/;
+const HOLD = /^Death_[AB]$|T-Pose/;
+const CHAIN = { Sit_Chair_Down: 'Sit_Chair_Idle', Sit_Floor_Down: 'Sit_Floor_Idle', Lie_Down: 'Lie_Idle', Jump_Start: 'Jump_Idle' };
+const PARTS = { Head: ['Knight_Head'], Body: ['Knight_Body'], Arms: ['Knight_ArmLeft', 'Knight_ArmRight'], Legs: ['Knight_LegLeft', 'Knight_LegRight'] };
+const GEAR = /Shield|Sword|Helmet|Cape/;
+const PRESETS = {
+  Default:   { leg: 1,    torso: 1,    girth: 1,    arm: 1,    head: 1 },
+  Shortstack:{ leg: 0.55, torso: 0.85, girth: 1.1,  arm: 0.85, head: 1.2 },
+  Tall:      { leg: 2.1,  torso: 1.35, girth: 0.85, arm: 1.25, head: 0.9 },
+  Round:     { leg: 0.85, torso: 1,    girth: 1.45, arm: 0.95, head: 1 },
+  Bobblehead:{ leg: 0.9,  torso: 0.9,  girth: 1,    arm: 0.9,  head: 1.7 },
+};
+
+const stage = document.getElementById('stage');
+const nowEl = document.getElementById('now');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8fb8c9);
+const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x6b5a45, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+sun.position.set(3, 6, 4);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+scene.add(sun);
+const floor = new THREE.Mesh(new THREE.CircleGeometry(6, 64), new THREE.MeshStandardMaterial({ color: 0xe9dcc3, roughness: 1 }));
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+function resize() {
+  const { clientWidth: w, clientHeight: h } = stage;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+
+// ---- state ----
+let mixer, actions = {}, current, holder, bones = {}, rest = [], legLen = 0, hipDrop = 0, H = 2;
+const body = { leg: 1, torso: 1, girth: 1, arm: 1, head: 1 };
+let fade = 0.25;
+
+new GLTFLoader().load(MODEL_URL, gltf => {
+  document.getElementById('status').remove();
+  holder = new THREE.Group();
+  holder.add(gltf.scene);
+  scene.add(holder);
+  gltf.scene.traverse(o => {
+    if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; }
+    if (o.isBone) { bones[o.name] = o; rest.push([o, o.position.clone(), o.quaternion.clone(), o.scale.clone()]); }
+    if (GEAR.test(o.name)) o.visible = false;
+  });
+  scene.updateMatrixWorld(true);
+
+  const box = new THREE.Box3().setFromObject(gltf.scene);
+  H = box.max.y - box.min.y;
+  const w = v => bones[v].getWorldPosition(new THREE.Vector3());
+  legLen = w('upperlegl').distanceTo(w('lowerlegl')) + w('lowerlegl').distanceTo(w('footl'));
+  hipDrop = w('hips').y - w('upperlegl').y;
+  controls.target.set(0, H * 0.45, 0);
+  camera.position.set(H * 1.1, H * 0.8, H * 2.6);
+
+  setupColors(gltf.scene);
+  setupMask(gltf.scene);
+
+  mixer = new THREE.AnimationMixer(gltf.scene);
+  for (const clip of gltf.animations) actions[clip.name] = mixer.clipAction(clip);
+  mixer.addEventListener('finished', e => {
+    if (e.action !== current) return;
+    const n = e.action.getClip().name;
+    if (CHAIN[n]) play(CHAIN[n]); else if (!HOLD.test(n)) play(IDLE);
+  });
+  buildChips(gltf.animations);
+  window.viewer = { bones, body, actions, scene, root: gltf.scene };
+  play(IDLE, 0);
+}, undefined, err => { console.error(err); nowEl.textContent = 'Could not load model: ' + err.message; });
+
+function play(name, f = fade) {
+  const next = actions[name];
+  if (!next) return;
+  next.reset();
+  next.setLoop(LOOP.test(name) ? THREE.LoopRepeat : THREE.LoopOnce, Infinity);
+  next.clampWhenFinished = true;
+  next.setEffectiveWeight(1);
+  next.play();
+  if (current && current !== next) next.crossFadeFrom(current, f, false);
+  current = next;
+  nowEl.textContent = `${name} · ${next.getClip().duration.toFixed(2)} s`;
+  document.querySelectorAll('[data-clip]').forEach(b => b.classList.toggle('on', b.dataset.clip === name));
+}
+
+function buildChips(clips) {
+  const chip = c => {
+    const b = document.createElement('button');
+    b.dataset.clip = c.name;
+    b.innerHTML = `${c.name.replace(/_/g, ' ')}<small>${c.duration.toFixed(1)}s</small>`;
+    b.onclick = () => play(c.name);
+    return b;
+  };
+  const byName = Object.fromEntries(clips.map(c => [c.name, c]));
+  for (const n of PICKS) if (byName[n]) document.getElementById('picks').append(chip(byName[n]));
+  for (const c of clips) document.getElementById('all').append(chip(c));
+}
+
+// ---- body shape: applied every frame on top of whatever the animation set ----
+function applyBody() {
+  const B = n => bones[n];
+  for (const s of ['l', 'r']) {
+    B('lowerleg' + s).position.multiplyScalar(body.leg);   // longer thigh
+    B('foot' + s).position.multiplyScalar(body.leg);       // longer shin
+    B('lowerarm' + s).position.multiplyScalar(body.arm);
+    B('wrist' + s).position.multiplyScalar(body.arm);
+  }
+  B('spine').position.multiplyScalar(body.torso);
+  B('chest').position.multiplyScalar(body.torso);
+  // Girth: grow the hips uniformly (the torso inherits it), then shrink limbs and head back to normal size.
+  // Uniform scale avoids the shearing that non-uniform scale causes on rotating children.
+  B('hips').scale.multiplyScalar(body.girth);
+  for (const n of ['upperlegl', 'upperlegr', 'upperarml', 'upperarmr']) B(n).scale.multiplyScalar(1 / body.girth);
+  B('head').scale.multiplyScalar(body.head / body.girth);
+  // Keep feet on the floor: longer legs or a bigger pelvis lift the whole character.
+  holder.position.y = (body.leg - 1) * legLen + (body.girth - 1) * hipDrop;
+}
+
+document.querySelectorAll('[data-body]').forEach(r => {
+  const out = r.nextElementSibling;
+  const sync = () => { body[r.dataset.body] = +r.value; out.value = (+r.value).toFixed(2); };
+  r.oninput = sync; sync();
+});
+for (const [name, p] of Object.entries(PRESETS)) {
+  const b = document.createElement('button');
+  b.textContent = name;
+  b.onclick = () => document.querySelectorAll('[data-body]').forEach(r => { r.value = p[r.dataset.body]; r.oninput(); });
+  document.getElementById('presets').append(b);
+}
+for (const [id, set] of [['speed', v => mixer && (mixer.timeScale = v)], ['fade', v => fade = v]]) {
+  const r = document.getElementById(id), out = r.nextElementSibling;
+  r.oninput = () => { set(+r.value); out.value = (+r.value).toFixed(2); };
+  r.oninput();
+}
+
+// ---- colours: each body part gets its own copy of the material, tinted ----
+function setupColors(root) {
+  const wrap = document.getElementById('colors');
+  for (const [part, names] of Object.entries(PARTS)) {
+    const mats = [];
+    for (const n of names) root.getObjectByName(n)?.traverse(o => {
+      if (o.isMesh) { o.material = o.material.clone(); mats.push(o.material); }
+    });
+    const l = document.createElement('label');
+    l.innerHTML = `${part}<input type="color" value="#ffffff">`;
+    l.querySelector('input').oninput = e => mats.forEach(m => m.color.set(e.target.value));
+    wrap.append(l);
+  }
+  document.getElementById('gear').onchange = e => root.traverse(o => { if (GEAR.test(o.name)) o.visible = e.target.checked; });
+}
+
+// ---- face mask: a slightly curved paper card stuck to the head bone ----
+let mask, maskLocal, maskState = 'on', frontMat;
+const vel = new THREE.Vector3(), spin = new THREE.Vector3(), landQ = new THREE.Quaternion();
+let landT = 0, returnT = 0, fromP = new THREE.Vector3(), fromQ = new THREE.Quaternion();
+
+function faceCanvas(img) {
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(256, 256, 250, 0, 7); g.fill();
+  g.save(); g.beginPath(); g.arc(256, 256, 226, 0, 7); g.clip();
+  if (img) {
+    const s = Math.max(452 / img.width, 452 / img.height);
+    g.drawImage(img, 256 - img.width * s / 2, 256 - img.height * s / 2, img.width * s, img.height * s);
+  } else {
+    g.fillStyle = '#f2c29b'; g.fillRect(0, 0, 512, 512);
+    g.fillStyle = '#2b2118';
+    g.beginPath(); g.ellipse(180, 220, 26, 34, 0, 0, 7); g.ellipse(332, 220, 26, 34, 0, 0, 7); g.fill();
+    g.lineWidth = 14; g.lineCap = 'round'; g.strokeStyle = '#2b2118';
+    g.beginPath(); g.moveTo(140, 160); g.lineTo(215, 172); g.moveTo(372, 160); g.lineTo(297, 172); g.stroke();
+    g.beginPath(); g.arc(256, 300, 90, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke();
+    g.fillStyle = '#e8988a'; g.beginPath(); g.arc(150, 300, 30, 0, 7); g.arc(362, 300, 30, 0, 7); g.fill();
+  }
+  g.restore();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+
+function setupMask(root) {
+  const headMesh = root.getObjectByName('Knight_Head');
+  const hb = new THREE.Box3().setFromObject(headMesh);
+  const size = (hb.max.x - hb.min.x) * 0.82;
+  const geo = new THREE.PlaneGeometry(1, 1, 24, 1);
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) p.setZ(i, -0.32 * p.getX(i) ** 2);
+  geo.computeVertexNormals();
+  const tex = faceCanvas();
+  frontMat = new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.5, roughness: 0.85, side: THREE.FrontSide });
+  const back = new THREE.MeshStandardMaterial({ color: 0xb38b5d, alphaMap: tex, alphaTest: 0.5, roughness: 1, side: THREE.BackSide });
+  mask = new THREE.Group();
+  for (const m of [frontMat, back]) { const mesh = new THREE.Mesh(geo, m); mesh.castShadow = true; mask.add(mesh); }
+  mask.scale.setScalar(size);
+  mask.position.set((hb.min.x + hb.max.x) / 2, hb.min.y + (hb.max.y - hb.min.y) * 0.45, hb.max.z + size * 0.03);
+  scene.add(mask);
+  bones.head.attach(mask);
+  maskLocal = { p: mask.position.clone(), q: mask.quaternion.clone(), s: mask.scale.clone() };
+}
+
+document.getElementById('photo').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => { frontMat.map.dispose(); frontMat.map = faceCanvas(img); frontMat.needsUpdate = true; URL.revokeObjectURL(img.src); };
+  img.src = URL.createObjectURL(f);
+};
+document.getElementById('showMask').onchange = e => mask.visible = e.target.checked;
+document.getElementById('knock').onclick = () => {
+  if (maskState !== 'on') return;
+  scene.attach(mask);
+  const u = H / 2;
+  vel.set((Math.random() - 0.5) * 1.6 * u, 2.6 * u, 1.6 * u);
+  spin.set((Math.random() - 0.5) * 14, (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 14);
+  maskState = 'falling';
+  play('Hit_B');
+};
+document.getElementById('pickup').onclick = () => {
+  if (maskState !== 'down') return;
+  maskState = 'waiting';
+  play('PickUp');
+  setTimeout(() => { fromP.copy(mask.position); fromQ.copy(mask.quaternion); returnT = 0; maskState = 'returning'; },
+    actions.PickUp.getClip().duration * 0.45 * 1000 / mixer.timeScale);
+};
+
+const tmpM = new THREE.Matrix4(), tmpP = new THREE.Vector3(), tmpQ = new THREE.Quaternion(), tmpS = new THREE.Vector3();
+const dq = new THREE.Quaternion(), de = new THREE.Euler();
+function updateMask(dt) {
+  const g = 9.8 * H / 1.8, floorY = 0.004 * H;
+  if (maskState === 'falling') {
+    vel.y -= g * dt;
+    mask.position.addScaledVector(vel, dt);
+    mask.quaternion.multiply(dq.setFromEuler(de.set(spin.x * dt, spin.y * dt, spin.z * dt)));
+    if (mask.position.y < floorY) {
+      mask.position.y = floorY;
+      if (Math.abs(vel.y) > 1.2 * H / 2) { vel.y *= -0.35; vel.x *= 0.6; vel.z *= 0.6; spin.multiplyScalar(0.5); }
+      else {
+        const faceUp = Math.random() < 0.6;
+        landQ.setFromEuler(new THREE.Euler(0, Math.random() * 6.28, 0)).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(faceUp ? -Math.PI / 2 : Math.PI / 2, 0, 0)));
+        landT = 0; maskState = 'landing';
+      }
+    }
+  } else if (maskState === 'landing') {
+    landT = Math.min(1, landT + dt * 5);
+    mask.quaternion.slerp(landQ, landT);
+    mask.position.y = floorY + 0.01 * H;
+    if (landT === 1) maskState = 'down';
+  } else if (maskState === 'returning') {
+    returnT = Math.min(1, returnT + dt * 3);
+    tmpM.compose(maskLocal.p, maskLocal.q, maskLocal.s).premultiply(bones.head.matrixWorld).decompose(tmpP, tmpQ, tmpS);
+    const k = returnT * returnT * (3 - 2 * returnT);
+    mask.position.lerpVectors(fromP, tmpP, k).y += Math.sin(k * Math.PI) * 0.15 * H;
+    mask.quaternion.slerpQuaternions(fromQ, tmpQ, k);
+    if (returnT === 1) {
+      bones.head.add(mask);
+      mask.position.copy(maskLocal.p); mask.quaternion.copy(maskLocal.q); mask.scale.copy(maskLocal.s);
+      maskState = 'on';
+    }
+  }
+}
+
+// ---- loop ----
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mixer) {
+    for (const [b, p, q, s] of rest) { b.position.copy(p); b.quaternion.copy(q); b.scale.copy(s); }
+    mixer.update(dt);
+    applyBody();
+    scene.updateMatrixWorld();
+    updateMask(dt * mixer.timeScale);
+  }
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
