@@ -59,6 +59,16 @@ No KiP remake, fan clone, or PlayLink protocol RE project was found.
 | [Open Trivia DB](https://opentdb.com) | ~4k+ categorised questions, free API | CC BY-SA 4.0 |
 | Buzzin, Kwishetwel | Commercial browser-based KiP-likes (TV + phones). Proof of demand; closed source | — |
 
+### Avatar / animation assets (none of the games above have reusable character art)
+
+| Asset | What | License |
+|---|---|---|
+| [KayKit Character Animations](https://kaylousberg.itch.io/kaykit-character-animations) + [Adventurers](https://kaylousberg.itch.io/kaykit-adventurers) | 133 humanoid clips, chunky toy-like characters, hats/props that share the rig | CC0 |
+| [Quaternius UAL 1](https://quaternius.com/packs/universalanimationlibrary.html) + [UAL 2](https://quaternius.itch.io/universal-animation-library-2) | 120+ and 130+ clips on one humanoid rig, glTF, mannequin base | CC0 |
+| MediaPipe Face Landmarker | Detects and crops a selfie face on the phone itself | Apache-2.0 |
+
+Ready Player Me closed in Jan 2026, which is the same obsolescence problem again. Don't depend on avatar SaaS.
+
 ## 4. Recommendation
 
 Build new (**Option B**) as a **browser game**: the TV/laptop opens the host page, phones join via
@@ -66,14 +76,7 @@ QR code, and there is no app store at all. That makes it immune to the obsolesce
 Use quizify's architecture and MIT code as reference/donor, but build standalone (Node/TS or Python
 server, not Home Assistant). Start questions from OpenTDB and our own JSON packs.
 
-Ideas that go beyond the original:
-- **8–16+ players, plus teams**, and an audience mode where extra phones vote or heckle.
-- Pacing fix: vote and Power Play selection happen *simultaneously* with a short timer.
-- More challenge types: estimation slider, ordering/timeline, picture questions.
-- Power Play intensity setting (off / mild / chaos), following the Decades feedback.
-- Pyramid finale kept as the signature, with the climb rendered on the TV.
-- Remote play: same room code over the internet, with optional streaming of the host screen.
-- Pack editor + import (CSV/JSON), with community packs living in the repo.
+Design ideas and the game loop: see [DESIGN.md](DESIGN.md).
 
 Option A as a side quest: if you have a PS4 and the game, grab the APK and check its `lib/` folders
 first. That one check decides whether patching is viable.
