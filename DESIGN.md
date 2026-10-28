@@ -2,9 +2,21 @@
 
 Timings are placeholders. They get tuned once the game runs.
 
+## Pilot goals (agreed 2026-10-28)
+- **Audience:** a private pilot with friends, then an open-source release. Memes and assets get cleaned up before release.
+- **Roles:** João designs and playtests, Claude builds. There is no deadline, so quality comes before speed.
+- **Setup:** a laptop on HDMI runs the server and the TV page. Phones join over the home Wi-Fi.
+- **Players:** usually 6–8, so timings and the arena layout are tuned for a full house. A game lasts about 30 min.
+- **Content:** English only. Questions come from Open Trivia DB.
+- **Look:** the KayKit chunky toy style.
+- **Host:** a KayKit character with a TTS voice, read through a swappable voice adapter. The pilot starts with
+  the browser's built-in voices (Edge's "Natural" voices are good), and Kokoro/Piper can run locally later for
+  better offline voices. Reading never blocks: the answer timer runs while the host speaks.
+- **Success means:** friends ask to replay, it runs all evening without crashing, and the gags get laughs.
+
 ## Pilot scope (proposed): one full evening with friends
 **In**
-- Lobby: the TV shows a room code + QR code. Phones join over the LAN with a name, selfie mask, colours and a body preset. 2–8 players.
+- Lobby: the TV shows a room code + QR code. Phones join over the LAN with a name, selfie mask, colours and a body preset. 2–8 players, tuned for 6–8.
 - Loop: topic wheel (votes + the 5 wheel powers) → 4 answer arenas → combined tally, about 9 questions.
 - Sorting + Linking (the KiP originals). Both are mostly phone UI, so they're cheap.
 - Pyramid finale (simple version).
