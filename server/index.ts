@@ -37,6 +37,8 @@ if (isProd) {
   app.use(vite.middlewares);
 }
 
+const log = (room: Room, msg: string) => console.log(`[${room.code}] ${msg}`);
+
 function broadcast(room: Room) {
   io.to(room.code).emit('room:state', rooms.publicState(room, joinUrl(room.code)));
 }
@@ -72,6 +74,7 @@ io.on('connection', (socket: GameSocket) => {
   socket.on('tv:create', safe(cb => {
     const room = rooms.create();
     attachTv(socket, room);
+    log(room, `created by a TV (${socket.handshake.headers['user-agent']?.match(/Firefox|Edg|Chrome|Safari/)?.[0] ?? 'browser'})`);
     cb({ ok: true, code: room.code, tvToken: room.tvToken });
     broadcast(room);
   }));
@@ -95,6 +98,7 @@ io.on('connection', (socket: GameSocket) => {
     player.socketId = socket.id;
     socket.data = { code: room.code, role: 'player', playerId: player.id };
     socket.join(room.code);
+    log(room, `${player.name} joined from ${socket.handshake.address} (${room.players.length} players)`);
     cb({ ok: true, playerId: player.id, token: player.token });
     broadcast(room);
   }));
@@ -114,6 +118,7 @@ io.on('connection', (socket: GameSocket) => {
     // Only the player's latest socket counts. An old socket closing after a reconnect must not mark them offline.
     if (player && player.socketId === socket.id) {
       player.connected = false;
+      log(room, `${player.name} dropped`);
       broadcast(room);
     }
   });
