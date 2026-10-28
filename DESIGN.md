@@ -2,6 +2,19 @@
 
 Timings are placeholders. They get tuned once the game runs.
 
+## Pilot scope (proposed): one full evening with friends
+**In**
+- Lobby: the TV shows a room code + QR code. Phones join over the LAN with a name, selfie mask, colours and a body preset. 2–8 players.
+- Loop: topic wheel (votes + the 5 wheel powers) → 4 answer arenas → combined tally, about 9 questions.
+- Sorting + Linking (the KiP originals). Both are mostly phone UI, so they're cheap.
+- Pyramid finale (simple version).
+- Power Plays: Freeze, Gloop, Bomble, Nibblers, Double Trouble, 50/50, Points Doubler, Bet, Points Party, with box
+  delivery (stacking, crouch, explosion). Bet uses only the default sign reaction.
+- Questions: Open Trivia DB + one custom pack.
+
+**After the pilot**: extra special rounds, rare gags (cough-and-shoot, Bet variants, float-up portal),
+custom clips (kiss, body pillow), teams/audience, remote play, host as player, more than 8 players.
+
 ## Pillars
 1. **No waiting.** Gameplay effects apply instantly on phones. Shows play in *dead time* or in parallel,
    and nothing plays one player after another, so the game doesn't get slower with more players.
