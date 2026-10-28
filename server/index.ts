@@ -128,7 +128,9 @@ io.on('connection', (socket: GameSocket) => {
 
 setInterval(() => rooms.sweep(30 * 60_000), 60_000).unref();
 
-http.listen(PORT, '0.0.0.0', () => {
+// '::' listens on IPv6 and IPv4 at once. IPv6 is a useful second path on networks where IPv4 misbehaves
+// (an address clash on the home LAN hid a phone's IPv4 replies, 2026-10-29).
+http.listen(PORT, '::', () => {
   console.log(`KiP Revamped is running.`);
   console.log(`  TV:     http://localhost:${PORT}/tv`);
   console.log(`  Phones: http://${host()}:${PORT}/   (same Wi-Fi)`);
