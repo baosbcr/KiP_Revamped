@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f1d1a">
+<title>KiP Revamped</title>
+<style>
+  :root {
+    --bg: #f4f1ea; --card: #ffffff; --ink: #1f1d1a; --muted: #6b665d; --line: #e2ddd2;
+    --accent: #d9480f; --accent-ink: #ffffff; --warn-bg: #fff3cd; --warn-ink: #6b4e00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161513; --card: #1f1e1b; --ink: #f1eee8; --muted: #a39d92; --line: #34322d;
+      --accent: #ff7a3d; --accent-ink: #161513; --warn-bg: #3a300f; --warn-ink: #ffe08a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 17px/1.4 system-ui, sans-serif;
+         padding: max(16px, env(safe-area-inset-top)) 16px 24px; }
+  main { max-width: 420px; margin: 0 auto; display: grid; gap: 16px; }
+  h1 { font-size: 28px; margin: 8px 0 0; letter-spacing: -0.01em; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; }
+  label { display: grid; gap: 6px; font-weight: 600; font-size: 15px; }
+  input { font: inherit; font-size: 20px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+          background: var(--bg); color: var(--ink); width: 100%; }
+  #code { text-transform: uppercase; letter-spacing: 0.2em; font-family: ui-monospace, monospace; font-weight: 700; }
+  button.primary { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 14px;
+                   font: inherit; font-weight: 800; font-size: 19px; cursor: pointer; }
+  button.primary:disabled { opacity: 0.5; }
+  .error { color: var(--accent); margin: 0; min-height: 1.4em; font-size: 15px; }
+  .muted { color: var(--muted); margin: 0; font-size: 15px; }
+  #banner { background: var(--warn-bg); color: var(--warn-ink); padding: 10px 14px; border-radius: 12px; font-weight: 600; }
+  #banner[hidden] { display: none; }
+  .me { display: flex; align-items: center; gap: 14px; }
+  .dot { width: 56px; height: 56px; border-radius: 50%; background: var(--me, #999); flex: none; border: 3px solid var(--card);
+         box-shadow: 0 0 0 2px var(--me, #999); }
+  .me strong { font-size: 22px; display: block; }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .swatches button { aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; background: var(--c); cursor: pointer; }
+  .swatches button.mine { border-color: var(--ink); }
+  .swatches button:disabled { opacity: 0.2; cursor: default; }
+  section[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>KiP Revamped</h1>
+  <div id="banner" hidden>Connection lost, reconnecting…</div>
+
+  <section id="join" class="card">
+    <label>Room code <input id="code" maxlength="4" autocomplete="off" autocapitalize="characters" inputmode="text" placeholder="ABCD"></label>
+    <label>Your name <input id="name" maxlength="16" autocomplete="nickname" placeholder="Name on the TV"></label>
+    <button class="primary" id="go">Join</button>
+    <p class="error" id="joinError"></p>
+  </section>
+
+  <section id="lobby" class="card" hidden>
+    <div class="me"><span class="dot"></span><span><strong id="myName"></strong><span class="muted">You're in. Watch the TV!</span></span></div>
+    <p class="muted">Pick your colour</p>
+    <div class="swatches" id="swatches"></div>
+    <p class="error" id="lobbyError"></p>
+    <p class="muted" id="waiting">Waiting for the host to start…</p>
+  </section>
+
+  <section id="playing" class="card" hidden>
+    <div class="me"><span class="dot"></span><span><strong id="myName2"></strong><span class="muted">Game on. Look at the TV!</span></span></div>
+    <p class="muted">The rounds are the next milestone.</p>
+  </section>
+</main>
+<script type="module" src="/phone/main.ts"></script>
+</body>
+</html>

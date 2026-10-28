@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "kip",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["node_modules/tsx/dist/cli.mjs", "server/index.ts"],
+      "port": 3000
+    },
+    {
       "name": "avatar-viewer",
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8642", "--directory", "prototypes/avatar-viewer"],

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KiP Revamped · TV</title>
+<style>
+  :root {
+    --bg: #8fb8c9; --panel: rgba(255, 255, 255, 0.92); --ink: #1f1d1a; --muted: #6b665d; --line: #e2ddd2;
+    --accent: #d9480f; --accent-ink: #fff; --plate: rgba(31, 29, 26, 0.78); --plate-ink: #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--ink); font: 18px/1.35 system-ui, sans-serif;
+         display: grid; grid-template-columns: 1fr minmax(300px, 26vw); }
+  #stage { position: relative; min-width: 0; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  #labels { position: absolute; inset: 0; pointer-events: none; }
+  .nameplate { background: var(--plate); color: var(--plate-ink); padding: 3px 10px; border-radius: 999px;
+               font-weight: 700; font-size: 16px; border: 3px solid var(--player, #fff); white-space: nowrap; }
+  .nameplate.offline { opacity: 0.45; }
+  .nameplate.offline::after { content: ' · reconnecting'; font-weight: 400; }
+  aside { background: var(--panel); padding: 28px 24px; display: flex; flex-direction: column; gap: 14px;
+          align-items: center; text-align: center; overflow-y: auto; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -0.01em; }
+  .muted { color: var(--muted); font-size: 15px; margin: 0; }
+  #qr { width: min(240px, 80%); height: auto; aspect-ratio: 1; image-rendering: pixelated; background: #fff;
+        border-radius: 12px; padding: 8px; }
+  #url { font: 600 15px/1.3 ui-monospace, monospace; word-break: break-all; margin: 0; }
+  #code { font: 800 64px/1 ui-monospace, monospace; letter-spacing: 0.12em; margin: 4px 0 0; }
+  #count { font-weight: 700; margin: 0; }
+  button { border: 0; background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 14px 28px;
+           font: inherit; font-weight: 800; font-size: 20px; cursor: pointer; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  #error { color: var(--accent); min-height: 1.4em; margin: 0; font-size: 15px; }
+  #status { position: absolute; left: 16px; top: 16px; background: var(--panel); padding: 6px 12px;
+            border-radius: 8px; font-weight: 700; }
+  #status:empty { display: none; }
+  .playing #lobby { display: none; }
+  #started { display: none; }
+  .playing #started { display: block; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="labels"></div><div id="status">Loading…</div></div>
+<aside>
+  <div id="lobby">
+    <h1>Join on your phone</h1>
+    <p class="muted">Scan the code, or open this address on the same Wi-Fi:</p>
+    <canvas id="qr" width="240" height="240"></canvas>
+    <p id="url"></p>
+    <p class="muted">Room code</p>
+    <p id="code">····</p>
+    <p id="count">0 players</p>
+    <button id="start" disabled>Start game</button>
+    <p id="error"></p>
+  </div>
+  <div id="started">
+    <h1>Game starting…</h1>
+    <p class="muted">The rounds are the next milestone.</p>
+  </div>
+</aside>
+<script type="module" src="/tv/main.ts"></script>
+</body>
+</html>
