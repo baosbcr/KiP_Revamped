@@ -68,7 +68,7 @@ still costs points. ✔ = documented in reviews or trophy guides.
 | **Bomble** ✔ | KiP | Bombs bounce around the answer screen. Tap the bombles to blow them before answering. Getting caught by one gives a short time-out | Picks the target | Costs time, plus a penalty |
 | **Nibblers** ✔ | KiP | Critters eat random letters out of every answer | Picks the target | Hurts **correctness**: you must guess the words. Stacks (2 Nibblers = more letters gone) |
 | **Double Trouble** ✔ | both | Gets two hazards at once (e.g. Freeze + Gloop) | Rarer pick, counts as 2 | Both effects stack |
-| **Bet** ✔ (3+ players) | both | No effect on the person bet on | Bets that another player will answer correctly. Bonus points if they do. The issuer's own answer is separate | None. It's a side wager |
+| **Bet** ✔ (3+ players) | both | No effect on the person bet on | Bets on another player. **Ours:** the bettor also gets the points that player earned on the question. The bettor's own answer scores separately | None. It's a side wager |
 | **Points Party** ✔ (3+ players, disco ball) | both | Everyone who answers correctly gets bonus points. Anyone wrong misses out | Throws a party for the table | None. It rewards correct answers and highlights who misses |
 | **Points Doubler** ✔ | Decades | n/a (played on yourself) | Doubles own points if they answer correctly | Self-buff. Pure risk/reward |
 | **50/50** ✔ | Decades | n/a (played on yourself) | Removes 2 wrong answers from own screen | Self-buff. Better odds |
@@ -80,7 +80,14 @@ Letter Scatter are dropped.
 **How each kind is delivered**
 - **Debuffs** (Freeze, Gloop, Bomble, Nibblers, Double Trouble): thrown onto the target's head and stacked (see above).
 - **Buffs** (Points Doubler, 50/50, Bet): the box lands in front of the player, and **they hop over it** to take it.
-  A Bet box shows the face of the player being bet on.
+- **Bet**: who you bet on **stays hidden** until the right answer is revealed. During the points tally, the
+  bettor pulls out a copy of that player's mask, and that player's points for the question get added to the
+  bettor's total too.
+  - Default (most of the time): the bettor holds the mask up like a cardboard sign.
+  - Rare, very short variants. If the bet-on player got it wrong: break it, trample it, or toss it at its owner.
+    If they got it right: kiss it, twirl with it, or put it on a body pillow and hug it.
+  - These play **only while the points are being added**. The mask and any prop (the body pillow) pop out of
+    existence the moment the tally finishes.
 - **Points Party**: the exception. The box is thrown into the air, opens to reveal a disco ball, and the ball hangs from
   an invisible ceiling. Several Points Parties hang side by side as a row centred over the stage.
 
