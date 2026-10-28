@@ -59,7 +59,7 @@ Happens after the wheel stops, with the characters already standing at the answe
 
 ## Debuff catalogue: the KiP / Decades Power Plays (baseline; ours get added later)
 KiP scores multiple-choice answers by **speed as well as correctness**, so a debuff that only slows you down
-still costs points. ✔ = documented in reviews or trophy guides. ~ = only the name is confirmed, effect inferred.
+still costs points. ✔ = documented in reviews or trophy guides.
 
 | Power Play | Game | Receiver | Issuer | What it does to answering |
 |---|---|---|---|---|
@@ -72,12 +72,17 @@ still costs points. ✔ = documented in reviews or trophy guides. ~ = only the n
 | **Points Party** ✔ (3+ players, disco ball) | both | Everyone who answers correctly gets bonus points. Anyone wrong misses out | Throws a party for the table | None. It rewards correct answers and highlights who misses |
 | **Points Doubler** ✔ | Decades | n/a (played on yourself) | Doubles own points if they answer correctly | Self-buff. Pure risk/reward |
 | **50/50** ✔ | Decades | n/a (played on yourself) | Removes 2 wrong answers from own screen | Self-buff. Better odds |
-| **Zipper** ✔ | Decades | Answers are zipped shut. Swipe to unzip each one | Picks the target | Costs time |
-| **Millennium Bug** ✔ | Decades | A furry bug glitches the screen. Tap it before the answers show | Picks the target | Costs time |
-| **Disco Inferno** ~ | Decades | Probably strobe/disco lights flashing over the answers | Picks the target | Probably hurts readability |
-| **Lockdown** ~ | Decades | Probably a lock on the screen that must be undone first | Picks the target | Probably costs time |
-| **Letter Scatter** ~ | Decades | Probably scrambles the letters of the answers (likely Nibblers' successor) | Picks the target | Hurts correctness |
 | **Power Pick** ✔ | both | Everyone | Once per game: forces the next topic door | Replaced by our wheel powers |
+
+From *Decades* we keep only Points Doubler and 50/50. Zipper, Millennium Bug, Disco Inferno, Lockdown and
+Letter Scatter are dropped.
+
+**How each kind is delivered**
+- **Debuffs** (Freeze, Gloop, Bomble, Nibblers, Double Trouble): thrown onto the target's head and stacked (see above).
+- **Buffs** (Points Doubler, 50/50, Bet): the box lands in front of the player, and **they hop over it** to take it.
+  A Bet box shows the face of the player being bet on.
+- **Points Party**: the exception. The box is thrown into the air, opens to reveal a disco ball, and the ball hangs from
+  an invisible ceiling. Several Points Parties hang side by side as a row centred over the stage.
 
 How they were given out: each question you pick 1 of 3 random Power Plays, then pick a target. Every hazard
 stacks, players who are behind are more likely to get Double Trouble, and Power Plays do nothing in 2-player
