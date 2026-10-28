@@ -125,9 +125,10 @@ if (socket.connected) hello();
 // ---- loop ----
 frameLineup(0);
 camera.position.copy(camTarget);
-const clock = new THREE.Clock();
-renderer.setAnimationLoop(() => {
-  const dt = Math.min(clock.getDelta(), 0.05);
+const timer = new THREE.Timer();
+renderer.setAnimationLoop(time => {
+  timer.update(time);
+  const dt = Math.min(timer.getDelta(), 0.05);
   for (const a of avatars.values()) {
     a.root.position.x += ((a.root.userData.slot ?? 0) - a.root.position.x) * Math.min(1, dt * 4);
     a.update(dt);
