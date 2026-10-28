@@ -19,6 +19,15 @@ npm run dev
 If the TV shows the wrong address (VPNs and virtual adapters can confuse it), set it yourself:
 `PUBLIC_HOST=192.168.1.25 npm run dev`.
 
+### Phone page stuck loading?
+Each of these has caused it on a real phone:
+- **Android 16+:** the browser needs the **Nearby devices** (local network) permission. Allow the prompt, or go to
+  Settings → Apps → *browser* → Permissions.
+- **Laptop on Tailscale with subnet routes:** if a tailnet node advertises the LAN you're on, run
+  `tailscale set --accept-routes=false` while you're there.
+- **Phone on a static IP inside the router's DHCP pool:** another device can get the same address. Use DHCP,
+  or a static address outside the pool.
+
 ## Scripts
 | | |
 |---|---|
