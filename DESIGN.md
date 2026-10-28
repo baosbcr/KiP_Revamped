@@ -14,7 +14,7 @@ Timings are placeholders. They get tuned once the game runs.
 ## Loop (draft)
 Lobby → [topic wheel → stage with the answer options → debuff boxes thrown and exploded → question → reveal] × N
 → special rounds → finale. The move into the question stage has no animation for now.
-**Ground portals are the transition for everything** (answer lock-in, round changes).
+**Ground portals are the transition between rounds.**
 
 ## Topic wheel (replaces KiP's doors + Power Play menu)
 - The categories on offer (the KiP "doors") become chunks of a wheel of fortune. Each has a base size,
@@ -25,20 +25,20 @@ Lobby → [topic wheel → stage with the answer options → debuff boxes thrown
 | Power | Effect |
 |---|---|
 | **Inverse** | Swaps the size of the player's picked chunk with the chunk that is largest *right now*, so inverses ping-pong. Several players can fire it until the wheel stops. If theirs is already the largest, the token isn't spent |
-| **Overwrite x** | Relabels x% of a random chunk (possibly their own) with the player's category. x is rolled when the power is received. The new chunk can be targeted by Inverse. With two chunks of one category, Inverse uses the largest |
+| **Overwrite x** | Paints a slice of x% of the whole wheel, at a random spot, with the player's category. It can cover parts of any chunks, including their own. x is rolled when the power is received. The new chunk can be targeted by Inverse. With two chunks of one category, Inverse uses the largest |
 | **Bump** | Adds a last burst of spin speed (still stops at timeout) and **knocks a Wedge out** |
 | **Reverse** | Reverses the spin direction. No effect on a wedged wheel |
 | **Wedge** (bow / spear / knife toss) | Pins the wheel in place. Other powers still apply until timeout |
 
 ## Question stage
-- When a player locks in, a portal opens under them and they jump in. The TV shows *who* has answered,
-  but not *what*, so nobody can copy.
-- At the reveal, everyone pops out of a portal at the answer zone they picked. The right zone lights up, and the
-  characters on it celebrate while the others react.
+- As in KiP: the 4 answers are 4 boxed arenas (framed panels on the floor), with the question above them.
+- When time is up, everyone walks to their chosen arena at the same time. Nobody moves before then,
+  so nobody can copy. Then the host reveals, the right arena lights up, and the characters on it celebrate
+  while the others react.
 
 ## Special rounds
 - Sorting, Linking (+ more ideas to come).
-- Transition: portals, as everywhere else. Gag: one random character floats *up* instead of falling in.
+- Transition: everyone jumps into a ground portal. Gag: one random character floats *up* instead of falling in.
 
 ## Debuffs: box delivery
 Happens after the wheel stops, with the characters already standing at the answer options.
@@ -51,9 +51,10 @@ Happens after the wheel stops, with the characters already standing at the answe
 4. At the end, the host explodes all boxes at once. The contents rain down, and each debuff has its own ink
    colour that stains the character (mask/body tint). The effects then apply on phones.
 - Throws are staggered **1 s apart** (to be tuned).
-- Box size has to keep the meme readable on the TV. The victim's phone can also show their incoming stack
-  at full size, since it's their private screen.
-- **Debuff cap per player**: still to tune, so one player can't be bombed with an impossible stack.
+- Box size has to keep the meme readable on the TV. The victim's phone also shows their incoming stack
+  at full size, **watermarked with each sender's face** (their mask selfie), for maximum troll.
+- **Debuff cap per player**: a fixed number, set very high to start, then tuned.
+- Memes: real memes are fine for the private pilot with friends. Licensing gets revisited before any public release.
 - Needs: an "arms up, holding" pose (small Blender job, or IK on the arms), and a crouch blended by box count.
 
 ## Gags (cosmetic)
@@ -82,7 +83,4 @@ Happens after the wheel stops, with the characters already standing at the answe
 - A short lock (~0.3 s) before the stop lets the last effect be seen on screen.
 
 ## Open questions
-- **Overwrite x**: is x% a share of the chosen chunk, or of the whole wheel?
-- **Debuff cap**: is it a fixed number of boxes, or scaled to the player's lead (leaders can take more)?
-- **Meme art**: real memes are copyrighted images, which is a problem for a game we publish. Original
-  meme-style art, or CC-licensed images, avoids that.
+- None right now.
