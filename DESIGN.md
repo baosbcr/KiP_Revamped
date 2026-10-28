@@ -35,6 +35,11 @@ Lobby → [topic wheel → stage with the answer options → debuff boxes thrown
 - When time is up, everyone walks to their chosen arena at the same time. Nobody moves before then,
   so nobody can copy. Then the host reveals, the right arena lights up, and the characters on it celebrate
   while the others react.
+- **One combined tally.** At the reveal the server already knows every answer, so it calculates final points,
+  including Points Party bonuses and Bet payouts, all at once. The TV then counts everyone up in a single
+  pass. Each counter shows colour-coded segments: base points, then party bonus, then bet points, and the Bet
+  mask goes up when the bet segment starts. Bets and parties make that player's count a bit longer, but they
+  never add a second round of tallying. A question with no Bet or Party has no extra time at all.
 
 ## Special rounds
 - Sorting, Linking (+ more ideas to come).
