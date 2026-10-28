@@ -57,6 +57,32 @@ Happens after the wheel stops, with the characters already standing at the answe
 - Memes: real memes are fine for the private pilot with friends. Licensing gets revisited before any public release.
 - Needs: an "arms up, holding" pose (small Blender job, or IK on the arms), and a crouch blended by box count.
 
+## Debuff catalogue: the KiP / Decades Power Plays (baseline; ours get added later)
+KiP scores multiple-choice answers by **speed as well as correctness**, so a debuff that only slows you down
+still costs points. ✔ = documented in reviews or trophy guides. ~ = only the name is confirmed, effect inferred.
+
+| Power Play | Game | Receiver | Issuer | What it does to answering |
+|---|---|---|---|---|
+| **Freeze** ✔ | KiP | Answers are encased in ice. Tap repeatedly to break all of it before answering | Picks the target | Costs time |
+| **Gloop** ✔ | KiP | Answers are hidden under slime. Wipe/rub the screen clean to read them | Picks the target | Costs time. Partial wiping risks misreading |
+| **Bomble** ✔ | KiP | Bombs bounce around the answer screen. Tap the bombles to blow them before answering. Getting caught by one gives a short time-out | Picks the target | Costs time, plus a penalty |
+| **Nibblers** ✔ | KiP | Critters eat random letters out of every answer | Picks the target | Hurts **correctness**: you must guess the words. Stacks (2 Nibblers = more letters gone) |
+| **Double Trouble** ✔ | both | Gets two hazards at once (e.g. Freeze + Gloop) | Rarer pick, counts as 2 | Both effects stack |
+| **Bet** ✔ (3+ players) | both | No effect on the person bet on | Bets that another player will answer correctly. Bonus points if they do. The issuer's own answer is separate | None. It's a side wager |
+| **Points Party** ✔ (3+ players, disco ball) | both | Everyone who answers correctly gets bonus points. Anyone wrong misses out | Throws a party for the table | None. It rewards correct answers and highlights who misses |
+| **Points Doubler** ✔ | Decades | n/a (played on yourself) | Doubles own points if they answer correctly | Self-buff. Pure risk/reward |
+| **50/50** ✔ | Decades | n/a (played on yourself) | Removes 2 wrong answers from own screen | Self-buff. Better odds |
+| **Zipper** ✔ | Decades | Answers are zipped shut. Swipe to unzip each one | Picks the target | Costs time |
+| **Millennium Bug** ✔ | Decades | A furry bug glitches the screen. Tap it before the answers show | Picks the target | Costs time |
+| **Disco Inferno** ~ | Decades | Probably strobe/disco lights flashing over the answers | Picks the target | Probably hurts readability |
+| **Lockdown** ~ | Decades | Probably a lock on the screen that must be undone first | Picks the target | Probably costs time |
+| **Letter Scatter** ~ | Decades | Probably scrambles the letters of the answers (likely Nibblers' successor) | Picks the target | Hurts correctness |
+| **Power Pick** ✔ | both | Everyone | Once per game: forces the next topic door | Replaced by our wheel powers |
+
+How they were given out: each question you pick 1 of 3 random Power Plays, then pick a target. Every hazard
+stacks, players who are behind are more likely to get Double Trouble, and Power Plays do nothing in 2-player
+games. *Decades* lets each Power Play be switched off in the settings.
+
 ## Gags (cosmetic)
 - Special animations are granted at random now and then, and can be used in dead time. Example: walk up,
   cough, pull a blaster, shoot. The victim is flung off-screen, their mask stays behind, and they run back
