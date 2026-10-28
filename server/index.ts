@@ -20,8 +20,10 @@ function lanAddress(): string {
   const rank = (ip: string) => ip.startsWith('192.168.') ? 0 : ip.startsWith('10.') ? 1 : ip.startsWith('172.') ? 2 : 3;
   return all.sort((a, b) => rank(a) - rank(b))[0] ?? 'localhost';
 }
-const host = process.env.PUBLIC_HOST ?? lanAddress();
-const joinUrl = (code: string) => `http://${host}:${PORT}/?r=${code}`;
+// Looked up on every use, so switching networks (e.g. to a phone hotspot) needs no restart. The TV picks it up
+// on the next broadcast, or on a reload.
+const host = () => process.env.PUBLIC_HOST ?? lanAddress();
+const joinUrl = (code: string) => `http://${host()}:${PORT}/?r=${code}`;
 
 const app = express();
 const http = createServer(app);
@@ -129,5 +131,5 @@ setInterval(() => rooms.sweep(30 * 60_000), 60_000).unref();
 http.listen(PORT, '0.0.0.0', () => {
   console.log(`KiP Revamped is running.`);
   console.log(`  TV:     http://localhost:${PORT}/tv`);
-  console.log(`  Phones: http://${host}:${PORT}/   (same Wi-Fi)`);
+  console.log(`  Phones: http://${host()}:${PORT}/   (same Wi-Fi)`);
 });
