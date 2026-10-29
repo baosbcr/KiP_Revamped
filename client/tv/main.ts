@@ -57,6 +57,15 @@ function frameLineup(n: number) {
   camTarget.set(0, charHeight * 1.1 + dist * 0.12, dist);
 }
 
+// A mask can arrive before the room:state that creates its avatar (e.g. right after a TV reload).
+const pendingMasks = new Map<string, string | null>();
+socket.on('room:mask', ({ playerId, dataUrl }) => {
+  const a = avatars.get(playerId);
+  if (!a) { pendingMasks.set(playerId, dataUrl); return; }
+  a.setMask(dataUrl);
+  if (dataUrl && a.root.userData.connected) a.play('Cheer', IDLE); // a little "ta-da" for the new face
+});
+
 function syncAvatars(state: RoomState) {
   const seen = new Set<string>();
   state.players.forEach((p, i) => {
@@ -72,6 +81,7 @@ function syncAvatars(state: RoomState) {
       else a.play('Sit_Floor_Idle');
       a.setOffline(!p.connected);
       a.root.userData.connected = p.connected;
+      if (pendingMasks.has(p.id)) { a.setMask(pendingMasks.get(p.id)!); pendingMasks.delete(p.id); }
     }
     a.setName(p.name);
     a.setColor(p.color);

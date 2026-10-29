@@ -1,4 +1,5 @@
 import { socket, session, local } from '../net.ts';
+import { cropFace } from './crop.ts';
 import { PLAYER_COLORS, type RoomState } from '../../shared/protocol.ts';
 
 interface Seat { code: string; token: string; name: string }
@@ -48,6 +49,32 @@ const swatches = PLAYER_COLORS.map(c => {
   $('swatches').append(b);
   return { c, b };
 });
+
+// Face photo: pick or shoot, crop to a circle, send. The server passes it to the TV only.
+const facePic = $('facePic');
+function showFace(dataUrl: string | null) {
+  facePic.style.backgroundImage = dataUrl ? `url("${dataUrl}")` : '';
+  facePic.textContent = dataUrl ? '' : '🙂';
+}
+for (const id of ['selfie', 'pick']) {
+  const input = $<HTMLInputElement>(id);
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    input.value = ''; // so picking the same file again still fires change
+    if (!file) return;
+    try {
+      const dataUrl = await cropFace(file);
+      if (!dataUrl) return;
+      socket.emit('player:mask', { dataUrl }, r => {
+        if (r.ok) showFace(dataUrl);
+        $('lobbyError').textContent = r.ok ? '' : r.error;
+      });
+    } catch (err) {
+      $('lobbyError').textContent = err instanceof Error ? err.message : 'Could not use that photo.';
+    }
+  };
+}
+socket.on('room:mask', ({ playerId, dataUrl }) => { if (playerId === me?.id) showFace(dataUrl); });
 
 socket.on('room:state', (state: RoomState) => {
   const mine = me && state.players.find(p => p.id === me!.id);

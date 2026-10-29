@@ -45,8 +45,15 @@ function broadcast(room: Room) {
   io.to(room.code).emit('room:state', rooms.publicState(room, joinUrl(room.code)));
 }
 
-/** Wraps a handler so bad input or a thrown error answers the caller instead of crashing the server. */
-/** Payloads are typed for convenience, but they come off the network, so handlers still treat them as untrusted. */
+/** Sends every face mask to one socket: a TV that just (re)attached. */
+function sendMasks(room: Room, socketId: string) {
+  for (const p of room.players) if (p.mask) io.to(socketId).emit('room:mask', { playerId: p.id, dataUrl: p.mask });
+}
+
+/**
+ * Wraps a handler so bad input or a thrown error answers the caller instead of crashing the server.
+ * Payloads are typed for convenience, but they come off the network, so handlers still treat them as untrusted.
+ */
 function safe<F extends (...args: any[]) => void>(fn: F): F {
   return ((...args: unknown[]) => {
     const cb = args.at(-1);
@@ -86,6 +93,7 @@ io.on('connection', (socket: GameSocket) => {
     attachTv(socket, room);
     cb({ ok: true, code: room.code, tvToken: room.tvToken });
     broadcast(room);
+    sendMasks(room, socket.id);
   }));
 
   socket.on('tv:start', safe(cb => {
@@ -103,12 +111,25 @@ io.on('connection', (socket: GameSocket) => {
     log(room, `${player.name} joined from ${socket.handshake.address} (${room.players.length} players)`);
     cb({ ok: true, playerId: player.id, token: player.token });
     broadcast(room);
+    // A reloaded phone gets its own face back, so its preview survives.
+    if (player.mask) socket.emit('room:mask', { playerId: player.id, dataUrl: player.mask });
   }));
 
   socket.on('player:color', safe((p, cb) => {
     const room = roomOf(socket, 'player');
     rooms.setColor(room, socket.data.playerId!, p?.color);
     cb({ ok: true });
+    broadcast(room);
+  }));
+
+  socket.on('player:mask', safe((p, cb) => {
+    const room = roomOf(socket, 'player');
+    const playerId = socket.data.playerId!;
+    rooms.setMask(room, playerId, p?.dataUrl);
+    const dataUrl = room.players.find(pl => pl.id === playerId)?.mask ?? null;
+    cb({ ok: true });
+    if (room.tvSocketId) io.to(room.tvSocketId).emit('room:mask', { playerId, dataUrl });
+    log(room, `${room.players.find(pl => pl.id === playerId)?.name} ${dataUrl ? `set a face (${Math.round(dataUrl.length / 1024)} kB)` : 'removed their face'}`);
     broadcast(room);
   }));
 

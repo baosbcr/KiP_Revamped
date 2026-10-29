@@ -1,8 +1,10 @@
 // Room and player bookkeeping. Pure logic with no sockets, so it can be unit-tested.
 import { randomBytes, randomUUID } from 'node:crypto';
 import {
-  MAX_PLAYERS, MIN_PLAYERS, NAME_MAX, PLAYER_COLORS, type Phase, type RoomState,
+  MASK_MAX_CHARS, MAX_PLAYERS, MIN_PLAYERS, NAME_MAX, PLAYER_COLORS, type Phase, type RoomState,
 } from '../shared/protocol.ts';
+
+const MASK_DATA_URL = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
 
 // No I or O: they're easy to confuse with 1 and 0 when typing the code on a phone.
 const CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -17,6 +19,8 @@ export interface Player {
   color: string;
   connected: boolean;
   socketId?: string;
+  /** Face photo (data URL). Kept in memory only, and gone with the room. */
+  mask?: string;
 }
 
 export interface Room {
@@ -110,6 +114,16 @@ export class Rooms {
     player.color = color;
   }
 
+  setMask(room: Room, playerId: string, dataUrl: unknown): void {
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) throw new RoomError('You are not in this game.');
+    if (dataUrl === null) { delete player.mask; return; }
+    if (typeof dataUrl !== 'string' || dataUrl.length > MASK_MAX_CHARS || !MASK_DATA_URL.test(dataUrl)) {
+      throw new RoomError('That photo could not be used. Try another one.');
+    }
+    player.mask = dataUrl;
+  }
+
   start(room: Room): void {
     if (room.phase !== 'lobby') throw new RoomError('The game has already started.');
     const ready = room.players.filter(p => p.connected).length;
@@ -122,7 +136,7 @@ export class Rooms {
       code: room.code,
       phase: room.phase,
       joinUrl,
-      players: room.players.map(({ id, name, color, connected }) => ({ id, name, color, connected })),
+      players: room.players.map(({ id, name, color, connected, mask }) => ({ id, name, color, connected, hasMask: !!mask })),
     };
   }
 

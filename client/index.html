@@ -43,6 +43,24 @@
   .swatches button.mine { border-color: var(--ink); }
   .swatches button:disabled { opacity: 0.2; cursor: default; }
   section[hidden] { display: none; }
+  .face { display: flex; align-items: center; gap: 14px; }
+  .face-pic { width: 76px; height: 76px; border-radius: 50%; flex: none; border: 3px solid var(--me, #999);
+              background: var(--bg) center / cover no-repeat; display: grid; place-items: center; font-size: 34px; }
+  .face-btns { display: grid; gap: 8px; flex: 1; }
+  label.btn { display: block; text-align: center; border-radius: 12px; padding: 11px; font-weight: 700; cursor: pointer;
+              background: var(--accent); color: var(--accent-ink); }
+  label.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  label.btn input { display: none; }
+  .small { font-size: 13px; }
+  #cropper { position: fixed; inset: 0; background: var(--bg); z-index: 10; display: grid; align-content: center;
+             gap: 14px; padding: 16px; justify-items: center; }
+  #cropper[hidden] { display: none; }
+  #cropCanvas { width: min(100%, 420px); aspect-ratio: 1; border-radius: 16px; touch-action: none; background: #000; }
+  #cropper label { width: min(100%, 420px); display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; }
+  #cropper input[type=range] { accent-color: var(--accent); }
+  .crop-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: min(100%, 420px); }
+  button.secondary { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 12px;
+                     padding: 14px; font: inherit; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -59,6 +77,15 @@
 
   <section id="lobby" class="card" hidden>
     <div class="me"><span class="dot"></span><span><strong id="myName"></strong><span class="muted">You're in. Watch the TV!</span></span></div>
+    <p class="muted">Your face</p>
+    <div class="face">
+      <div class="face-pic" id="facePic">🙂</div>
+      <div class="face-btns">
+        <label class="btn">Take a selfie<input type="file" id="selfie" accept="image/*" capture="user"></label>
+        <label class="btn ghost">Pick a photo<input type="file" id="pick" accept="image/*"></label>
+      </div>
+    </div>
+    <p class="muted small">Your photo only goes to the TV, and it's forgotten when the game ends.</p>
     <p class="muted">Pick your colour</p>
     <div class="swatches" id="swatches"></div>
     <p class="error" id="lobbyError"></p>
@@ -70,6 +97,12 @@
     <p class="muted">The rounds are the next milestone.</p>
   </section>
 </main>
+<div id="cropper" hidden>
+  <canvas id="cropCanvas"></canvas>
+  <p class="muted">Drag to put your face in the circle. Pinch or slide to zoom.</p>
+  <label>Zoom <input type="range" id="zoom" min="1" max="4" step="0.01" value="1"></label>
+  <div class="crop-row"><button class="secondary" id="cropCancel">Cancel</button><button class="primary" id="cropUse">Use this</button></div>
+</div>
 <script type="module" src="/phone/main.ts"></script>
 </body>
 </html>

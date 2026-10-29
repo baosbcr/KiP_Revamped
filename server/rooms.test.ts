@@ -80,6 +80,21 @@ test('colours must be from the palette and free', () => {
   assert.equal(b.color, '#e85fa8');
 });
 
+test('masks accept small image data URLs only, and can be removed', () => {
+  const rooms = new Rooms();
+  const room = rooms.create();
+  const a = rooms.join(room.code, 'A').player;
+  const jpeg = 'data:image/jpeg;base64,' + 'A'.repeat(1000);
+  rooms.setMask(room, a.id, jpeg);
+  assert.equal(rooms.publicState(room, '').players[0].hasMask, true);
+  assert.throws(() => rooms.setMask(room, a.id, 'data:text/html;base64,AAAA'), /photo/);
+  assert.throws(() => rooms.setMask(room, a.id, 'data:image/jpeg;base64,<script>'), /photo/);
+  assert.throws(() => rooms.setMask(room, a.id, 'data:image/jpeg;base64,' + 'A'.repeat(400_000)), /photo/);
+  assert.throws(() => rooms.setMask(room, 'nobody', jpeg), /not in this game/);
+  rooms.setMask(room, a.id, null);
+  assert.equal(rooms.publicState(room, '').players[0].hasMask, false);
+});
+
 test('sweep removes only idle, empty rooms', () => {
   let t = 0;
   const rooms = new Rooms(() => t);
