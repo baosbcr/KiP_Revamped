@@ -21,6 +21,7 @@ export interface Player {
   socketId?: string;
   /** Face photo (data URL). Kept in memory only, and gone with the room. */
   mask?: string;
+  ready: boolean;
 }
 
 export interface Room {
@@ -99,24 +100,43 @@ export class Rooms {
 
     const used = new Set(room.players.map(p => p.color));
     const color = PLAYER_COLORS.find(c => !used.has(c)) ?? PLAYER_COLORS[0];
-    const player: Player = { id: randomUUID(), token: randomUUID(), name, color, connected: true };
+    const player: Player = { id: randomUUID(), token: randomUUID(), name, color, connected: true, ready: false };
     room.players.push(player);
     return { room, player };
+  }
+
+  private player(room: Room, playerId: string): Player {
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) throw new RoomError('You are not in this game.');
+    return player;
+  }
+
+  /** A locked-in player's look is final until they unlock, so the host's "everyone's ready" stays true. */
+  private changeable(room: Room, playerId: string): Player {
+    const player = this.player(room, playerId);
+    if (player.ready) throw new RoomError('Unlock first to change your look.');
+    return player;
   }
 
   setColor(room: Room, playerId: string, color: unknown): void {
     if (typeof color !== 'string' || !(PLAYER_COLORS as readonly string[]).includes(color)) {
       throw new RoomError('Unknown colour.');
     }
-    const player = room.players.find(p => p.id === playerId);
-    if (!player) throw new RoomError('You are not in this game.');
+    const player = this.changeable(room, playerId);
     if (room.players.some(p => p !== player && p.color === color)) throw new RoomError('Someone already has that colour.');
     player.color = color;
   }
 
+  setReady(room: Room, playerId: string, ready: unknown): void {
+    if (typeof ready !== 'boolean') throw new RoomError('Something went wrong.');
+    const player = this.player(room, playerId);
+    if (ready && !player.mask) throw new RoomError('Add your face first.');
+    if (room.phase !== 'lobby') throw new RoomError('The game has already started.');
+    player.ready = ready;
+  }
+
   setMask(room: Room, playerId: string, dataUrl: unknown): void {
-    const player = room.players.find(p => p.id === playerId);
-    if (!player) throw new RoomError('You are not in this game.');
+    const player = this.changeable(room, playerId);
     if (dataUrl === null) { delete player.mask; return; }
     if (typeof dataUrl !== 'string' || dataUrl.length > MASK_MAX_CHARS || !MASK_DATA_URL.test(dataUrl)) {
       throw new RoomError('That photo could not be used. Try another one.');
@@ -126,8 +146,10 @@ export class Rooms {
 
   start(room: Room): void {
     if (room.phase !== 'lobby') throw new RoomError('The game has already started.');
-    const ready = room.players.filter(p => p.connected).length;
-    if (ready < MIN_PLAYERS) throw new RoomError(`Need at least ${MIN_PLAYERS} players.`);
+    const online = room.players.filter(p => p.connected);
+    if (online.length < MIN_PLAYERS) throw new RoomError(`Need at least ${MIN_PLAYERS} players.`);
+    const waiting = online.filter(p => !p.ready).map(p => p.name);
+    if (waiting.length) throw new RoomError(`Waiting for ${waiting.join(', ')} to lock in.`);
     room.phase = 'playing';
   }
 
@@ -136,7 +158,8 @@ export class Rooms {
       code: room.code,
       phase: room.phase,
       joinUrl,
-      players: room.players.map(({ id, name, color, connected, mask }) => ({ id, name, color, connected, hasMask: !!mask })),
+      players: room.players.map(({ id, name, color, connected, mask, ready }) =>
+        ({ id, name, color, connected, hasMask: !!mask, ready })),
     };
   }
 

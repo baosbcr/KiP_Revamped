@@ -122,6 +122,14 @@ io.on('connection', (socket: GameSocket) => {
     broadcast(room);
   }));
 
+  socket.on('player:ready', safe((p, cb) => {
+    const room = roomOf(socket, 'player');
+    rooms.setReady(room, socket.data.playerId!, p?.ready);
+    cb({ ok: true });
+    log(room, `${room.players.find(pl => pl.id === socket.data.playerId)?.name} ${p.ready ? 'locked in' : 'unlocked'}`);
+    broadcast(room);
+  }));
+
   socket.on('player:mask', safe((p, cb) => {
     const room = roomOf(socket, 'player');
     const playerId = socket.data.playerId!;

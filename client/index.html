@@ -43,6 +43,9 @@
   .swatches button.mine { border-color: var(--ink); }
   .swatches button:disabled { opacity: 0.2; cursor: default; }
   section[hidden] { display: none; }
+  .look { display: grid; gap: 12px; transition: opacity 0.2s; }
+  .look.locked { opacity: 0.4; pointer-events: none; }
+  button.primary.done { background: var(--card); color: var(--ink); border: 2px solid var(--me, var(--line)); }
   .face { display: flex; align-items: center; gap: 14px; }
   .face-pic { width: 76px; height: 76px; border-radius: 50%; flex: none; border: 3px solid var(--me, #999);
               background: var(--bg) center / cover no-repeat; display: grid; place-items: center; font-size: 34px; }
@@ -77,6 +80,7 @@
 
   <section id="lobby" class="card" hidden>
     <div class="me"><span class="dot"></span><span><strong id="myName"></strong><span class="muted">You're in. Watch the TV!</span></span></div>
+    <div class="look" id="look">
     <p class="muted">Your face</p>
     <div class="face">
       <div class="face-pic" id="facePic">🙂</div>
@@ -88,8 +92,10 @@
     <p class="muted small">Your photo only goes to the TV, and it's forgotten when the game ends.</p>
     <p class="muted">Pick your colour</p>
     <div class="swatches" id="swatches"></div>
+    </div>
     <p class="error" id="lobbyError"></p>
-    <p class="muted" id="waiting">Waiting for the host to start…</p>
+    <button class="primary" id="ready" disabled>Lock in</button>
+    <p class="muted" id="readyHint">Add your face to lock in.</p>
   </section>
 
   <section id="playing" class="card" hidden>

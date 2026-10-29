@@ -10,9 +10,12 @@ Set it back to `true` in the dorm. The router and NOS settings were never the pr
 
 **Selfie masks (2026-10-29):** phone takes or picks a photo, crops it to a circle (drag, pinch, zoom), sends a ~10–40 kB
 JPEG. The TV shows it on a curved paper mask on the head bone. The photo stays in server memory only, goes only to the TV
-and its owner, and comes back after TV or phone reloads. Tested in the browser pane; not yet on a real phone.
+and its owner, and comes back after TV or phone reloads. Works on João's Pixel.
+
+**Lock-in (2026-10-29):** players lock in once they have a face (name, colour and face then can't change until
+they unlock). The TV shows ✓ and "waiting for …". Start needs every *connected* player locked in (min 2). Offline players
+don't block the start. The server enforces all of it.
 
 ## Next
-1. Real-phone test of masks: selfie camera, pinch zoom, lock and unlock the phone.
-2. Next milestone: the core question loop (OpenTDB, 4 arenas, timer, speed scoring, tally).
+1. Next milestone: the core question loop (OpenTDB, 4 arenas, timer, speed scoring, tally).
 2. Next milestone (pick one): the core question loop (OpenTDB, 4 arenas, timer, speed scoring, tally) or selfie masks.

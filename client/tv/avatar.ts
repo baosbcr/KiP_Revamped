@@ -171,6 +171,7 @@ export class Avatar {
 
   setName(name: string) { this.label.textContent = name; }
   setOffline(offline: boolean) { this.label.classList.toggle('offline', offline); }
+  setReady(ready: boolean) { this.label.classList.toggle('ready', ready); }
 
   update(dt: number) { this.mixer.update(dt); }
 

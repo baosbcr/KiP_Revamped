@@ -19,6 +19,8 @@ export interface PublicPlayer {
   color: string;
   connected: boolean;
   hasMask: boolean;
+  /** Locked in: name, colour and face are final, and the player is waiting for the host to start. */
+  ready: boolean;
 }
 
 export interface RoomState {
@@ -40,6 +42,8 @@ export interface ClientToServer {
   'player:color': (p: { color: string }, cb: (r: Ack) => void) => void;
   /** A face photo as a JPEG data URL, already cropped square on the phone. null removes it. */
   'player:mask': (p: { dataUrl: string | null }, cb: (r: Ack) => void) => void;
+  /** Lock in (needs a face) or unlock to change your look. */
+  'player:ready': (p: { ready: boolean }, cb: (r: Ack) => void) => void;
 }
 
 export interface ServerToClient {

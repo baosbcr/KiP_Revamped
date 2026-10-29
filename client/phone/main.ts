@@ -76,6 +76,27 @@ for (const id of ['selfie', 'pick']) {
 }
 socket.on('room:mask', ({ playerId, dataUrl }) => { if (playerId === me?.id) showFace(dataUrl); });
 
+// Lock in: tells the host this player's look is final. Tapping again unlocks it to change something.
+const readyBtn = $<HTMLButtonElement>('ready');
+let amReady = false;
+readyBtn.onclick = () => {
+  readyBtn.disabled = true;
+  socket.emit('player:ready', { ready: !amReady }, r => {
+    readyBtn.disabled = false;
+    $('lobbyError').textContent = r.ok ? '' : r.error;
+  });
+};
+function renderReady(hasMask: boolean, ready: boolean) {
+  amReady = ready;
+  $('look').classList.toggle('locked', ready);
+  readyBtn.classList.toggle('done', ready);
+  readyBtn.disabled = !hasMask && !ready;
+  readyBtn.textContent = ready ? 'Locked in ✓ · tap to change' : 'Lock in';
+  $('readyHint').textContent = ready ? 'Waiting for the host to start…'
+    : hasMask ? 'Happy with your look? Lock in so the host can start.'
+    : 'Add your face to lock in.';
+}
+
 socket.on('room:state', (state: RoomState) => {
   const mine = me && state.players.find(p => p.id === me!.id);
   if (!mine) return;
@@ -85,6 +106,7 @@ socket.on('room:state', (state: RoomState) => {
     b.classList.toggle('mine', c === mine.color);
     b.disabled = state.players.some(p => p.id !== mine.id && p.color === c);
   }
+  renderReady(mine.hasMask, mine.ready);
   show(state.phase === 'lobby' ? 'lobby' : 'playing');
 });
 

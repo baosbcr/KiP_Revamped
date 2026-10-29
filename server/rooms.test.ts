@@ -2,6 +2,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Rooms, RoomError, cleanName } from './rooms.ts';
 import { MAX_PLAYERS } from '../shared/protocol.ts';
+import type { Room, Player } from './rooms.ts';
+
+const FACE = 'data:image/jpeg;base64,' + 'A'.repeat(100);
+/** Gives a player a face and locks them in, the way a phone would. */
+function lockIn(rooms: Rooms, room: Room, player: Player) {
+  rooms.setMask(room, player.id, FACE);
+  rooms.setReady(room, player.id, true);
+}
 
 test('room codes are 4 letters with no I or O', () => {
   const rooms = new Rooms();
@@ -50,23 +58,45 @@ test('newcomers cannot join after the start, but dropped players can rejoin', ()
   const rooms = new Rooms();
   const room = rooms.create();
   const a = rooms.join(room.code, 'A').player;
-  rooms.join(room.code, 'B');
+  const b = rooms.join(room.code, 'B').player;
+  lockIn(rooms, room, a);
+  lockIn(rooms, room, b);
   rooms.start(room);
   assert.throws(() => rooms.join(room.code, 'C'), /started/);
   a.connected = false;
   assert.equal(rooms.join(room.code, 'A').player.id, a.id);
 });
 
-test('start needs two connected players', () => {
+test('start needs two connected players, all locked in', () => {
   const rooms = new Rooms();
   const room = rooms.create();
-  rooms.join(room.code, 'A');
+  const a = rooms.join(room.code, 'A').player;
   const b = rooms.join(room.code, 'B').player;
+  const c = rooms.join(room.code, 'Cat').player;
+  lockIn(rooms, room, a);
   b.connected = false;
+  c.connected = false;
   assert.throws(() => rooms.start(room), /at least 2/);
   b.connected = true;
-  rooms.start(room);
+  assert.throws(() => rooms.start(room), /Waiting for B to lock in/);
+  lockIn(rooms, room, b);
+  rooms.start(room); // Cat is offline, so they don't hold the game up
   assert.equal(room.phase, 'playing');
+});
+
+test('lock-in needs a face, freezes your look, and can be undone', () => {
+  const rooms = new Rooms();
+  const room = rooms.create();
+  const a = rooms.join(room.code, 'A').player;
+  assert.throws(() => rooms.setReady(room, a.id, true), /face first/);
+  lockIn(rooms, room, a);
+  assert.equal(rooms.publicState(room, '').players[0].ready, true);
+  assert.throws(() => rooms.setColor(room, a.id, '#e85fa8'), /Unlock first/);
+  assert.throws(() => rooms.setMask(room, a.id, null), /Unlock first/);
+  assert.throws(() => rooms.setReady(room, a.id, 'yes'), RoomError);
+  rooms.setReady(room, a.id, false);
+  rooms.setColor(room, a.id, '#e85fa8');
+  assert.equal(a.color, '#e85fa8');
 });
 
 test('colours must be from the palette and free', () => {

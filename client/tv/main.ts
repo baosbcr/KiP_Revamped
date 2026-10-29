@@ -85,6 +85,11 @@ function syncAvatars(state: RoomState) {
     }
     a.setName(p.name);
     a.setColor(p.color);
+    a.setReady(p.ready);
+    if (a.root.userData.ready !== undefined && a.root.userData.ready !== p.ready && p.connected) {
+      a.play(p.ready ? 'Cheer' : 'Interact', IDLE); // cheer on lock-in, a little fiddle on unlock
+    }
+    a.root.userData.ready = p.ready;
     if (a.root.userData.connected !== p.connected) {
       a.root.userData.connected = p.connected;
       a.setOffline(!p.connected);
@@ -108,9 +113,13 @@ function render(state: RoomState) {
     $('url').textContent = state.joinUrl.replace(/^https?:\/\//, '');
     QRCode.toCanvas($('qr'), state.joinUrl, { width: 240, margin: 1 }).catch(console.error);
   }
-  const online = state.players.filter(p => p.connected).length;
-  $('count').textContent = `${state.players.length} / ${MAX_PLAYERS} players`;
-  startBtn.disabled = online < MIN_PLAYERS;
+  // Offline players don't hold the game up; everyone connected must be locked in.
+  const online = state.players.filter(p => p.connected);
+  const waiting = online.filter(p => !p.ready).map(p => p.name);
+  $('count').textContent = `${state.players.length} / ${MAX_PLAYERS} players · ${online.length - waiting.length} locked in`;
+  startBtn.disabled = online.length < MIN_PLAYERS || waiting.length > 0;
+  $('waiting').textContent = online.length < MIN_PLAYERS ? `Need at least ${MIN_PLAYERS} players.`
+    : waiting.length ? `Waiting for ${waiting.join(', ')} to lock in.` : 'Everyone is locked in!';
   syncAvatars(state);
 }
 
